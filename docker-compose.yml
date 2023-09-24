@@ -1,0 +1,38 @@
+version: '3'
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: some-rabbit
+    hostname: my-rabbit
+    ports:
+      - "8085:15672"
+      - "5672:5672"
+    networks:
+      - app_net
+
+  nestjs:
+    build:
+      context: ./nest-socket-io-chat
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    restart: on-failure  
+    depends_on:
+      - rabbitmq
+    networks:
+      - app_net
+      
+
+
+  reactapp:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    networks:
+      - app_net
+
+networks:
+  app_net:
+     driver: bridge
